@@ -1,0 +1,81 @@
+server:
+  port: 8080 # Gateway Service runs on port 8080
+
+spring:
+  application:
+    name: gateway-service
+  config:
+    import: "optional:consul:" # Import Consul configuration
+  cloud:
+    consul:
+      discovery:
+        prefer-ip-address: true # Prefer IP address for service discovery
+    gateway:
+      discovery:
+        locator:
+          enabled: true # Enable dynamic discovery-based routing
+      globalcors:
+        cors-configurations:
+          '[/**]': # Apply CORS to all routes
+            allowedOrigins:
+              - "http://localhost:3000" # Add the allowed origin(s) here
+            allowedMethods:
+              - "GET"
+              - "POST"
+              - "PUT"
+              - "DELETE"
+              - "OPTIONS"
+            allowedHeaders:
+              - "*"
+            exposedHeaders:
+              - "*"
+            allowCredentials: true # Allow cookies or credentials
+      routes:
+        # Explicit route for Group Service
+        - id: group-service
+          uri: lb://group-service
+          predicates:
+            - Path=/group/**
+          filters:
+            - StripPrefix=1
+        # Explicit route for User Service
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
+        # Explicit route for Runescape Service
+        - id: runescape-service
+          uri: lb://runescape-service
+          predicates:
+            - Path=/runescape/**
+          filters:
+            - StripPrefix=1
+        # Explicit route for Search Service
+        - id: search-service
+          uri: lb://search-service
+          predicates:
+            - Path=/search/**
+          filters:
+            - StripPrefix=1
+        # Explicit route for Communication Service
+        - id: communication-service
+          uri: lb://communication-service
+          predicates:
+            - Path=/communication/**
+          filters:
+            - StripPrefix=1
+        # Explicit route for Friend Service
+        - id: friend-service
+          uri: lb://friend-service
+          predicates:
+            - Path=/friend/**
+          filters:
+            - StripPrefix=1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
